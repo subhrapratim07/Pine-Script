@@ -1,2 +1,2 @@
-#Tradingview
+
 Pine_script_Tradingview
