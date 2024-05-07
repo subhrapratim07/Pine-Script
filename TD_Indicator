@@ -1,0 +1,143 @@
+//@version=5
+indicator("TD_Indicator", overlay=true)
+
+// Define input options for checkboxes
+checkbox1 = input(true, "TD buy setup")
+checkbox2 = input(true, "TD sell setup")
+checkbox3 = input(true, "TD perfected buy")
+checkbox4 = input(true, "TD perfected sell")
+checkbox5 = input(true,"TD buy countdown")
+checkbox6 = input(true,"TD sell countdown")
+
+// TD buy setup
+var int buySetup = na
+Bearish_flip=close[1] > close[5]
+buySetup := if close < close[4]
+    if Bearish_flip or 0 < nz(buySetup[1])
+        nz(buySetup[1]) + 1
+    else
+        0
+    if nz(buySetup[1]) == 9 
+        1
+    else
+        nz(buySetup[1]) + 1
+else
+    0
+
+// TD sell setup
+var int sellSetup = na
+Bullish_flip=close[1] > close[5]
+sellSetup := if close > close[4]
+    if Bullish_flip or 0 < nz(sellSetup[1])
+        nz(sellSetup[1]) + 1
+    else
+        0
+    if nz(sellSetup[1]) == 9
+        1
+    else
+        nz(sellSetup[1]) + 1
+else
+    0
+
+// TD perfected buy
+isPerfectionbuy() =>
+    // Check if low of bars eight or nine is less than or equal to lows of bars six and seven
+    (low[8] <= low[6] and low[8] <= low[7]) or (low[9] <= low[6] and low[9] <= low[7])
+
+// Plot arrow down only below the ninth bar when perfection condition is met
+plotshape(checkbox3 ? (isPerfectionbuy() and buySetup == 9) : na, style=shape.labelup, location=location.belowbar, color=#50d2d9, size=size.small)
+
+
+// TD perfection sell
+isPerfectionsell() =>
+    // Check if low of bars eight or nine is less than or equal to lows of bars six and seven
+    (high[8] >= high[6] and high[8] >= high[7]) or (high[9] >= high[6] and high[9] >= high[7])
+
+// Plot arrow down only below the ninth bar when perfection condition is met
+plotshape(checkbox4 ? (isPerfectionsell() and sellSetup == 9) : na, style=shape.labeldown, location=location.abovebar, color=#e281f4, size=size.small)
+
+
+//td buy countdown
+var int buyCountdown = na
+
+
+if not na(buySetup) and buySetup == 9
+    buyCountdown := 1
+else if not na(buyCountdown) and buyCountdown > 0 and close <= low[2]
+    buyCountdown := buyCountdown + 1
+
+// TD Buy Countdown cancellation
+if not na(buySetup) and buySetup == 9 and close > high[2]
+    buyCountdown := na
+
+//plot countdown
+plotshape(checkbox5 ?(buyCountdown == 13  and close <= low[2]) : na, text='13' ,  color=color.lime,style =shape.triangleup, location=location.belowbar)
+plotshape(checkbox5 ?(buyCountdown == 12  and close <= low[2]) : na, text='12',  color=color.lime,style=shape.triangleup, location=location.belowbar)
+plotshape(checkbox5 ?(buyCountdown == 11  and close <= low[2]) : na, text='11',  color=color.lime,style=shape.triangleup, location=location.belowbar)
+plotshape(checkbox5 ?(buyCountdown == 10  and close <= low[2]) : na, text='10',  color=color.lime,style=shape.triangleup, location=location.belowbar)
+plotshape(checkbox5 ?(buyCountdown == 9  and close <= low[2]) : na, text='9',  color=color.lime,style=shape.triangleup, location=location.belowbar)
+plotshape(checkbox5 ?(buyCountdown == 8  and close <= low[2]) : na, text='8',  color=color.lime,style=shape.triangleup, location=location.belowbar)
+plotshape(checkbox5 ?(buyCountdown == 7  and close <= low[2]) : na, text='7',  color=color.lime,style=shape.triangleup, location=location.belowbar)
+plotshape(checkbox5 ?(buyCountdown == 6  and close <= low[2]) : na, text='6',  color=color.lime,style=shape.triangleup, location=location.belowbar)
+plotshape(checkbox5 ?(buyCountdown == 5  and close <= low[2]) : na, text='5',  color=color.lime,style=shape.triangleup, location=location.belowbar)
+plotshape(checkbox5 ?(buyCountdown == 4  and close <= low[2]) : na, text='4',  color=color.lime,style=shape.triangleup, location=location.belowbar)
+plotshape(checkbox5 ?(buyCountdown == 3  and close <= low[2]) : na, text='3',  color=color.lime,style=shape.triangleup, location=location.belowbar)
+plotshape(checkbox5 ?(buyCountdown == 2  and close <= low[2]) : na, text='2',  color=color.lime,style=shape.triangleup, location=location.belowbar)
+plotshape(checkbox5 ?(buySetup == 9 ) : na, text='1',  color=color.lime,style=shape.triangleup, location=location.belowbar)
+plotshape(checkbox5 ?(buyCountdown == 1  and close <= low[2]) : na, text='1',  color=color.lime,style=shape.triangleup, location=location.belowbar)
+
+
+//td sell countdown
+var int sellCountdown = na
+
+
+if not na(sellSetup) and sellSetup == 9
+    sellCountdown := 1
+else if not na(sellCountdown) and sellCountdown > 0 and close >= low[2]
+    sellCountdown := sellCountdown + 1
+
+// TD sell Countdown cancellation
+if not na(sellSetup) and sellSetup == 9 and close > high[2]
+    sellCountdown := na
+
+//plot countdown
+plotshape(checkbox6 ?(sellCountdown == 13  and close >= low[2]) : na, text='13' ,  color=color.orange,style =shape.triangledown, location=location.abovebar)
+plotshape(checkbox6 ?(sellCountdown == 12  and close >= low[2]) : na, text='12',  color=color.orange,style=shape.triangledown, location=location.abovebar)
+plotshape(checkbox6 ?(sellCountdown == 11  and close >= low[2]) : na, text='11',  color=color.orange,style=shape.triangledown, location=location.abovebar)
+plotshape(checkbox6 ?(sellCountdown == 10  and close >= low[2]) : na, text='10',  color=color.orange,style=shape.triangledown, location=location.abovebar)
+plotshape(checkbox6 ?(sellCountdown == 9  and close >= low[2]) : na, text='9',  color=color.orange,style=shape.triangledown, location=location.abovebar)
+plotshape(checkbox6 ?(sellCountdown == 8  and close >= low[2]) : na, text='8',  color=color.orange,style=shape.triangledown, location=location.abovebar)
+plotshape(checkbox6 ?(sellCountdown == 7  and close >= low[2]) : na, text='7',  color=color.orange,style=shape.triangledown, location=location.abovebar)
+plotshape(checkbox6 ?(sellCountdown == 6  and close >= low[2]) : na, text='6',  color=color.orange,style=shape.triangledown, location=location.abovebar)
+plotshape(checkbox6 ?(sellCountdown == 5  and close >= low[2]) : na, text='5',  color=color.orange,style=shape.triangledown, location=location.abovebar)
+plotshape(checkbox6 ?(sellCountdown == 4  and close >= low[2]) : na, text='4',  color=color.orange,style=shape.triangledown, location=location.abovebar)
+plotshape(checkbox6 ?(sellCountdown == 3  and close >= low[2]) : na, text='3',  color=color.orange,style=shape.triangledown, location=location.abovebar)
+plotshape(checkbox6 ?(sellCountdown == 2  and close >= low[2]) : na, text='2',  color=color.orange,style=shape.triangledown, location=location.abovebar)
+plotshape(checkbox6 ?(sellSetup == 9 ) : na, text='1',  color=color.orange,style=shape.triangledown, location=location.abovebar)
+plotshape(checkbox6 ?(sellCountdown == 1  and close >= low[2]) : na, text='1',  color=color.orange,style=shape.triangledown, location=location.abovebar)
+
+
+
+// TD BUY Plot the numbers only if the series is complete and consecutive
+plotchar(checkbox1 ? (buySetup == 9) : na, char='9', color=color.red, location=location.belowbar)
+plotchar(checkbox1 ? (buySetup == 9) : na, char='8', color=color.red, location=location.belowbar, offset = -1)
+plotchar(checkbox1 ? (buySetup == 9) : na, char='7', color=color.red, location=location.belowbar, offset = -2)
+plotchar(checkbox1 ? (buySetup == 9) : na, char='6', color=color.red, location=location.belowbar, offset = -3)
+plotchar(checkbox1 ? (buySetup == 9) : na, char='5', color=color.red, location=location.belowbar, offset = -4)
+plotchar(checkbox1 ? (buySetup == 9) : na, char='4', color=color.red, location=location.belowbar, offset = -5)
+plotchar(checkbox1 ? (buySetup == 9) : na, char='3', color=color.red, location=location.belowbar, offset = -6)
+plotchar(checkbox1 ? (buySetup == 9) : na, char='2', color=color.red, location=location.belowbar, offset = -7)
+plotchar(checkbox1 ? (buySetup == 9) : na, char='1', color=color.red, location=location.belowbar, offset = -8)
+
+
+
+//TD SELL Plot the numbers only if the series is complete and consecutive
+plotchar(checkbox2 ? (sellSetup == 9) : na, char='9', color=color.teal, location=location.abovebar)
+plotchar(checkbox2 ? (sellSetup == 9) : na, char='8', color=color.teal, location=location.abovebar, offset = -1)
+plotchar(checkbox2 ? (sellSetup == 9) : na, char='7', color=color.teal, location=location.abovebar, offset = -2)
+plotchar(checkbox2 ? (sellSetup == 9) : na, char='6', color=color.teal, location=location.abovebar, offset = -3)
+plotchar(checkbox2 ? (sellSetup == 9) : na, char='5', color=color.teal, location=location.abovebar, offset = -4)
+plotchar(checkbox2 ? (sellSetup == 9) : na, char='4', color=color.teal, location=location.abovebar, offset = -5)
+plotchar(checkbox2 ? (sellSetup == 9) : na, char='3', color=color.teal, location=location.abovebar, offset = -6)
+plotchar(checkbox2 ? (sellSetup == 9) : na, char='2', color=color.teal, location=location.abovebar, offset = -7)
+plotchar(checkbox2 ? (sellSetup == 9) : na, char='1', color=color.teal, location=location.abovebar, offset = -8)
