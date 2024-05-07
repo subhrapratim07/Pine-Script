@@ -1,0 +1,24 @@
+//@version=5
+indicator("BB_signal1", overlay=true)
+// Define input variables for Bollinger Bands
+length = input.int(20, title="Length")
+mult = input.float(2.0, title="Multiplier")
+src = input(close, title="Source")
+// Calculate SMA and standard deviation for Bollinger Bands
+sma = ta.sma(src, length)
+stddev = mult * ta.stdev(src, length)
+// Calculate upper and lower bands for Bollinger Bands
+upper_band = sma + stddev
+lower_band = sma - stddev
+// Define input variable for RSI
+rsi_length = input.int(14, title="RSI Length")
+// Calculate RSI
+rsi = ta.rsi(close, rsi_length)
+// Conditions for the bearish signal
+bearish_condition = close[1] > upper_band[1] and close < upper_band and rsi > 70
+// Plot Bollinger Bands
+plot(upper_band, color=color.blue, title="Upper Band")
+plot(lower_band, color=color.red, title="Lower Band")
+plot(sma, color=color.orange, title="SMA")
+// Plot Arrow
+plotshape(bearish_condition ? high + upper_band : na, style=shape.arrowdown, color=color.red, size=size.small, location=location.abovebar)
